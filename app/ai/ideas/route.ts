@@ -2,6 +2,16 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { ai, safeJson } from '@/lib/ai'
 
+export async function OPTIONS() {
+  return new Response(null, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  })
+}
+
 export async function POST(req: Request) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -32,5 +42,12 @@ export async function POST(req: Request) {
 
   const { data: inserted, error } = await supabase.from('ideas').insert(rows).select()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ ideas: inserted })
+  return NextResponse.json(
+  { ideas: inserted },
+  {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+  }
+)
 }
